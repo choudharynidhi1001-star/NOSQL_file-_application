@@ -1,0 +1,190 @@
+1. Student Activity Tracking
+db.students.insertOne({
+ name:"Abdul", courses:["MongoDB","Java"],
+ attendance:85, skills:["Python","HTML"],
+ activities:["Login","Assignment"]
+})
+
+db.students.find({attendance:{$gte:80}})
+db.students.find({skills:"Python"})
+2. Event Logging System
+db.events.insertMany([
+ {user:"Abdul",event:"login"},
+ {user:"Abdul",event:"failed-login"},
+ {user:"Abdul",event:"failed-login"},
+ {user:"Pooja",event:"file-upload"}
+])
+
+db.events.find({event:"failed-login"})
+3. Mini Blogging Platform
+db.blogs.insertOne({
+ title:"MongoDB Basics", author:"Abdul",
+ category:"Database", tags:["MongoDB","NoSQL"],
+ comments:["Good post"], published:true
+})
+
+db.blogs.find({tags:"MongoDB",category:"Database"})
+4. Flexible Product Catalog
+db.products.insertMany([
+ {name:"HP Laptop",category:"Laptop",ram:"8GB"},
+ {name:"iPhone",category:"Mobile",camera:"48MP"},
+ {name:"Canon",category:"Camera",zoom:"20x"}
+])
+
+db.products.find({category:"Laptop",ram:"8GB"})
+5. E-Commerce Order Management
+db.orders.insertOne({
+ customer:"Abdul",
+ products:[
+  {name:"Laptop",price:50000,qty:1},
+  {name:"Mouse",price:500,qty:2}
+ ]
+})
+
+db.orders.find({customer:"Abdul"})
+6. Website Analytics
+db.visits.insertMany([
+ {page:"Home",device:"Mobile"},
+ {page:"Home",device:"Laptop"},
+ {page:"Products",device:"Mobile"}
+])
+
+db.visits.aggregate([
+ {$group:{_id:"$page",total:{$sum:1}}}
+])
+7. Content Management System
+db.articles.insertOne({
+ title:"NoSQL Guide",author:"Abdul",
+ category:"Database",status:"Published"
+})
+
+db.articles.find({status:"Published"})
+db.articles.find({status:"Unpublished"})
+8. Shopping Cart
+db.carts.insertOne({
+ user:"Abdul",
+ items:[{product:"Laptop",price:50000,qty:1}]
+})
+
+db.carts.updateOne(
+ {user:"Abdul"},
+ {$set:{"items.0.qty":2}}
+)
+9. Product Review & Rating
+db.reviews.insertMany([
+ {product:"Laptop",rating:5},
+ {product:"Laptop",rating:4},
+ {product:"Mobile",rating:5}
+])
+
+db.reviews.aggregate([
+ {$group:{
+   _id:"$product",
+   avg:{$avg:"$rating"},
+   total:{$sum:1}
+ }}
+])
+10. Inventory Monitoring
+db.inventory.insertMany([
+ {product:"Laptop",stock:3,minStock:5},
+ {product:"Mouse",stock:10,minStock:5}
+])
+
+db.inventory.find({$expr:{$lt:["$stock","$minStock"]}})
+11. Bank Wallet Transfer
+session = db.getMongo().startSession()
+db = session.getDatabase("Bank")
+
+session.startTransaction()
+db.users.updateOne({name:"Abdul"},{$inc:{balance:-1000}})
+db.users.updateOne({name:"Pooja"},{$inc:{balance:1000}})
+session.commitTransaction()
+12. User Notifications
+db.notifications.find({
+ user:"Abdul",read:false
+})
+
+db.notifications.updateOne(
+ {user:"Abdul",read:false},
+ {$set:{read:true}}
+)
+13. Course Learning Platform
+db.students.insertOne({
+ name:"Abdul",
+ course:"MongoDB",
+ progress:80,
+ completed:false
+})
+
+db.students.find({progress:{$gte:70}})
+14. Real-Time Order Tracking
+db.orders.insertOne({
+ orderId:101,
+ status:"Shipped",
+ history:["Placed","Confirmed","Shipped"]
+})
+
+db.orders.findOne({orderId:101})
+15. Flexible News Database
+db.news.insertMany([
+ {title:"Tech News",category:"Technology",tags:["AI"]},
+ {title:"City News",location:"Delhi",category:"Local"}
+])
+
+db.news.find({category:"Technology"})
+db.news.find({tags:"AI"})
+Output
+1. Student Activity Tracking
+{ name: "Abdul", attendance: 85, skills: [ "Python", "HTML" ] }
+2. Event Logging
+{ user: "Abdul", event: "failed-login" }
+{ user: "Abdul", event: "failed-login" }
+3. Mini Blogging
+{ title: "MongoDB Basics", category: "Database",
+  tags: [ "MongoDB", "NoSQL" ] }
+4. Product Catalog
+{ name: "HP Laptop", category: "Laptop", ram: "8GB" }
+5. E-Commerce Orders
+{ customer: "Abdul",
+  products: [
+    { name: "Laptop", price: 50000, qty: 1 },
+    { name: "Mouse", price: 500, qty: 2 }
+  ]
+}
+6. Website Analytics
+{ _id: "Home", total: 2 }
+{ _id: "Products", total: 1 }
+7. Content Management
+{ title: "NoSQL Guide", status: "Published" }
+8. Shopping Cart
+{ user: "Abdul",
+  items: [ { product: "Laptop", price: 50000, qty: 2 } ]
+}
+9. Product Review
+{ _id: "Laptop", avg: 4.5, total: 2 }
+{ _id: "Mobile", avg: 5, total: 1 }
+10. Inventory
+{ product: "Laptop", stock: 3, minStock: 5 }
+
+Output: Laptop needs restocking.
+
+11. Bank Wallet Transfer
+Transaction committed successfully.
+Abdul balance: 4000
+Pooja balance: 6000
+12. Notifications
+Before: { user: "Abdul", read: false }
+After:  { user: "Abdul", read: true }
+13. Course Learning
+{ name: "Abdul", course: "MongoDB",
+  progress: 80, completed: false }
+14. Order Tracking
+{
+ orderId: 101,
+ status: "Shipped",
+ history: [ "Placed", "Confirmed", "Shipped" ]
+}
+15. News Database
+{ title: "Tech News",
+  category: "Technology",
+  tags: [ "AI" ] }

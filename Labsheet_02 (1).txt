@@ -1,0 +1,404 @@
+. MySQL vs MongoDB
+MySQL
+CREATE DATABASE CollegeDB;
+USE CollegeDB;
+
+CREATE TABLE Student(
+ Student_ID INT,
+ Name VARCHAR(30),
+ Course VARCHAR(20),
+ Semester INT,
+ Marks INT
+);
+
+INSERT INTO Student VALUES
+(1,'Abdul','BCA',5,85),
+(2,'Pooja','BCA',5,90),
+(3,'Rahul','BBA',4,78),
+(4,'Nidhi','BCA',5,92),
+(5,'Palak','BBA',4,88);
+
+SELECT * FROM Student;
+MongoDB
+use CollegeDB
+
+db.Students.insertMany([
+ {Student_ID:1,Name:"Abdul",Course:"BCA",Semester:5,Marks:85},
+ {Student_ID:2,Name:"Pooja",Course:"BCA",Semester:5,Marks:90},
+ {Student_ID:3,Name:"Rahul",Course:"BBA",Semester:4,Marks:78},
+ {Student_ID:4,Name:"Nidhi",Course:"BCA",Semester:5,Marks:92},
+ {Student_ID:5,Name:"Palak",Course:"BBA",Semester:4,Marks:88}
+])
+
+db.Students.find()
+Comparison
+Feature	MySQL	MongoDB
+Schema	Fixed	Flexible
+Storage	Tables/Rows	Documents
+Flexibility	Less	High
+Scalability	Mainly Vertical	Horizontal
+2. MongoDB Student Database
+use CollegeDB
+db.createCollection("Students")
+
+db.Students.insertMany([
+ {Student_ID:1,Name:"Abdul",Course:"BCA",Semester:5,Marks:85},
+ {Student_ID:2,Name:"Pooja",Course:"BCA",Semester:5,Marks:90},
+ {Student_ID:3,Name:"Rahul",Course:"BBA",Semester:4,Marks:78},
+ {Student_ID:4,Name:"Nidhi",Course:"BCA",Semester:5,Marks:92},
+ {Student_ID:5,Name:"Palak",Course:"BBA",Semester:4,Marks:88}
+])
+
+// 1. Display
+db.Students.find()
+
+// 2. Find BCA students
+db.Students.find({Course:"BCA"})
+
+// 3. Update marks
+db.Students.updateOne(
+ {Student_ID:1},
+ {$set:{Marks:95}}
+)
+
+// 4. Delete student
+db.Students.deleteOne({Student_ID:5})
+
+// 5. Count
+db.Students.countDocuments()
+
+Output after deletion: 4
+
+3. MongoDB Orders
+use CollegeDB
+
+db.Orders.insertMany([
+ {
+  Order_ID:1,
+  Customer:"Abdul",
+  Products:[
+   {name:"Laptop",qty:1,price:50000},
+   {name:"Mouse",qty:2,price:500}
+  ]
+ },
+ {
+  Order_ID:2,
+  Customer:"Pooja",
+  Products:[{name:"Phone",qty:1,price:20000}]
+ },
+ {
+  Order_ID:3,
+  Customer:"Rahul",
+  Products:[{name:"Keyboard",qty:2,price:1000}]
+ },
+ {
+  Order_ID:4,
+  Customer:"Nidhi",
+  Products:[{name:"Laptop",qty:1,price:45000}]
+ },
+ {
+  Order_ID:5,
+  Customer:"Abdul",
+  Products:[{name:"Headphone",qty:2,price:1500}]
+ }
+])
+
+// 1. Customer orders
+db.Orders.find({Customer:"Abdul"})
+
+// 2. Update quantity
+db.Orders.updateOne(
+ {Order_ID:1,"Products.name":"Mouse"},
+ {$set:{"Products.$.qty":3}}
+)
+
+// 3. Total amount
+db.Orders.aggregate([
+ {$unwind:"$Products"},
+ {$group:{
+   _id:"$Order_ID",
+   Total:{$sum:{$multiply:["$Products.qty","$Products.price"]}}
+ }}
+])
+
+// 4. Orders above 20000
+db.Orders.aggregate([
+ {$unwind:"$Products"},
+ {$group:{
+   _id:"$Order_ID",
+   Total:{$sum:{$multiply:["$Products.qty","$Products.price"]}}
+ }},
+ {$match:{Total:{$gt:20000}}}
+])
+4. Redis Student Information
+SET 1 Abdul
+SET 2 Pooja
+SET 3 Rahul
+SET 4 Nidhi
+SET 5 Palak
+Retrieve
+GET 1
+Update
+SET 1 "Abdul Malik"
+Delete
+DEL 5
+Display Keys
+KEYS *
+5. Cassandra
+CREATE KEYSPACE CollegeDB
+WITH replication = {'class':'SimpleStrategy','replication_factor':1};
+
+USE CollegeDB;
+
+CREATE TABLE Students(
+ Student_ID int PRIMARY KEY,
+ Name text,
+ Course text,
+ Semester int,
+ Marks int
+);
+
+INSERT INTO Students VALUES(1,'Abdul','BCA',5,85);
+INSERT INTO Students VALUES(2,'Pooja','BCA',5,90);
+INSERT INTO Students VALUES(3,'Rahul','BBA',4,78);
+INSERT INTO Students VALUES(4,'Nidhi','BCA',5,92);
+INSERT INTO Students VALUES(5,'Palak','BBA',4,88);
+
+SELECT * FROM Students;
+
+SELECT * FROM Students WHERE Course='BCA' ALLOW FILTERING;
+
+UPDATE Students SET Marks=95 WHERE Student_ID=1;
+
+DELETE FROM Students WHERE Student_ID=5;
+6. HBase
+Create Table
+create 'Students','personal','academic'
+Insert Records
+put '1','personal','Name','Abdul'
+put '1','personal','Course','BCA'
+put '1','academic','Semester','5'
+put '1','academic','Marks','85'
+
+put '2','personal','Name','Pooja'
+put '2','personal','Course','BCA'
+put '2','academic','Semester','5'
+put '2','academic','Marks','90'
+
+put '3','personal','Name','Rahul'
+put '3','personal','Course','BBA'
+put '3','academic','Semester','4'
+put '3','academic','Marks','78'
+
+put '4','personal','Name','Nidhi'
+put '4','personal','Course','BCA'
+put '4','academic','Semester','5'
+put '4','academic','Marks','92'
+
+put '5','personal','Name','Palak'
+put '5','personal','Course','BBA'
+put '5','academic','Semester','4'
+put '5','academic','Marks','88'
+Retrieve
+get '1'
+Update
+put '1','academic','Marks','95'
+Display All
+scan 'Students'
+Delete
+deleteall '5'
+7. Neo4j Student–Course Graph
+Create Students and Courses
+CREATE
+(a:Student {name:'Abdul'}),
+(b:Student {name:'Pooja'}),
+(c:Student {name:'Rahul'}),
+(d:Student {name:'Nidhi'}),
+(e:Student {name:'Palak'}),
+
+(x:Course {name:'BCA'}),
+(y:Course {name:'BBA'}),
+(z:Course {name:'MCA'});
+Relationships
+MATCH (s:Student {name:'Abdul'}),(c:Course {name:'BCA'})
+CREATE (s)-[:ENROLLED_IN]->(c);
+
+MATCH (s:Student {name:'Pooja'}),(c:Course {name:'BCA'})
+CREATE (s)-[:ENROLLED_IN]->(c);
+
+MATCH (s:Student {name:'Rahul'}),(c:Course {name:'BBA'})
+CREATE (s)-[:ENROLLED_IN]->(c);
+
+MATCH (s:Student {name:'Nidhi'}),(c:Course {name:'BCA'})
+CREATE (s)-[:ENROLLED_IN]->(c);
+
+MATCH (s:Student {name:'Palak'}),(c:Course {name:'BBA'})
+CREATE (s)-[:ENROLLED_IN]->(c);
+Queries
+// All students
+MATCH (s:Student) RETURN s;
+
+// Students in BCA
+MATCH (s:Student)-[:ENROLLED_IN]->(c:Course {name:'BCA'})
+RETURN s;
+
+// Courses of Abdul
+MATCH (s:Student {name:'Abdul'})-[:ENROLLED_IN]->(c)
+RETURN c;
+
+// Add relationship
+MATCH (s:Student {name:'Abdul'}),(c:Course {name:'MCA'})
+CREATE (s)-[:ENROLLED_IN]->(c);
+
+// Remove relationship
+MATCH (s:Student {name:'Abdul'})-[r:ENROLLED_IN]->(c:Course {name:'MCA'})
+DELETE r;
+8. MongoDB vs Cassandra vs Neo4j
+Feature	MongoDB	Cassandra	Neo4j
+Data Model	Document	Wide Column	Graph
+Storage	JSON/BSON	Rows/Columns	Nodes/Relationships
+Query	MongoDB Query	CQL	Cypher
+Scalability	High	Very High	High
+Suitable For	Web Apps	Big Data	Social Networks
+9. Single Server MongoDB
+use CollegeDB
+
+db.Students.insertOne({
+ Student_ID:1,
+ Name:"Abdul",
+ Course:"BCA",
+ Marks:85
+})
+
+db.Students.find()
+
+db.Students.updateOne(
+ {Student_ID:1},
+ {$set:{Marks:90}}
+)
+
+db.Students.deleteOne({Student_ID:1})
+
+db.Students.find()
+
+Result: CRUD operations successfully performed on a single server.
+
+10. MongoDB Sharding
+Sample Data
+use CollegeDB
+
+for(let i=1;i<=20;i++)
+ db.Students.insertOne({
+   Student_ID:i,
+   Name:"Student"+i,
+   Marks:60+i
+ })
+Shard Key
+sh.shardCollection("CollegeDB.Students",
+ {Student_ID:"hashed"})
+Verify
+sh.status()
+
+Benefit: Sharding distributes large data across multiple servers and improves scalability.
+
+11. Master-Slave / Primary-Secondary Replication
+Primary
+rs.initiate()
+Insert Data
+use CollegeDB
+db.Students.insertOne({ID:1,Name:"Abdul"})
+Check Replica Set
+rs.status()
+
+Working: Data written to the Primary is replicated to Secondary nodes. If the Primary fails, an eligible Secondary can be elected as the new Primary.
+
+12. Cassandra Peer-to-Peer Replication
+Keyspace
+CREATE KEYSPACE CollegeDB
+WITH replication =
+{'class':'NetworkTopologyStrategy','datacenter1':3};
+Insert
+USE CollegeDB;
+
+INSERT INTO Students
+(Student_ID,Name,Course,Semester,Marks)
+VALUES(1,'Abdul','BCA',5,85);
+Check
+SELECT * FROM Students;
+
+Difference:
+
+Cassandra → Peer-to-Peer
+No single master
+All nodes can participate in reads/writes
+Data is replicated across nodes
+13. Sharding + Replication
+                Application
+                     |
+              Sharded Database
+             /        |        \
+          Shard 1   Shard 2   Shard 3
+           /   \      /   \      /   \
+         P1    S1    P2    S2   P3    S3
+Sharding: Data distributed between shards.
+Replication: Each shard has replica nodes.
+Scalability: More shards can be added.
+Fault tolerance: Replica can serve when primary fails.
+14. MapReduce
+Dataset
+db.Students.insertMany([
+ {Student_ID:1,Name:"Abdul",Course:"BCA",Marks:85},
+ {Student_ID:2,Name:"Pooja",Course:"BCA",Marks:90},
+ {Student_ID:3,Name:"Rahul",Course:"BBA",Marks:78},
+ {Student_ID:4,Name:"Nidhi",Course:"BCA",Marks:92},
+ {Student_ID:5,Name:"Palak",Course:"BBA",Marks:88}
+])
+Number of Students
+db.Students.mapReduce(
+ function(){emit(this.Course,1);},
+ function(key,values){return Array.sum(values);},
+ {out:"course_count"}
+)
+
+db.course_count.find()
+Average Marks
+db.Students.mapReduce(
+ function(){emit(this.Course,this.Marks);},
+ function(key,values){
+   return Array.sum(values)/values.length;
+ },
+ {out:"course_average"}
+)
+
+db.course_average.find()
+
+Output:
+
+BCA → Count: 3, Average: 89
+BBA → Count: 2, Average: 83
+15. Database Distribution Models
+Model	Data Distribution	Failure Handling	Advantage	Limitation	Application
+Single Server	One server	Server failure affects service	Simple	Limited scalability	Small application
+Sharding	Across servers	Other shards continue	High scalability	Complex setup	Big Data
+Master-Slave	Primary + replicas	Secondary can take over	Data redundancy	Primary coordination	Banking
+Peer-to-Peer	Across equal nodes	Other nodes available	No single master	Complex consistency	Cassandra
+Sharding + Replication	Shards + replicas	Replica handles failure	Scalability + fault tolerance	Most complex	Large cloud systems
+Simple Architectures
+1. Single Server
+Client → Server → Database
+2. Sharding
+             Database
+          /     |     \
+      Shard1  Shard2  Shard3
+3. Master-Slave
+             Primary
+            /       \
+       Secondary  Secondary
+4. Peer-to-Peer
+       Node1 ↔ Node2
+         ↕       ↕
+       Node3 ↔ Node4
+5. Sharding + Replication
+       Shard 1       Shard 2
+       P ─ S         P ─ S
+       P ─ S         P ─ S

@@ -1,0 +1,221 @@
+// ==========================================
+// MONGODB LAB SHEET 1
+// ALL 25 PRACTICALS IN ONE PLACE
+// ==========================================
+
+
+// 1. Create StudentDB Database
+use("StudentDB");
+
+
+// 2. Create Students, Faculty and Courses Collections
+db.createCollection("Students");
+db.createCollection("Faculty");
+db.createCollection("Courses");
+
+
+// 3. Insert a Single Student Document
+db.Students.insertOne({
+    RollNo: 101,
+    Name: "Rahul",
+    Department: "BCA",
+    Semester: 6,
+    CGPA: 8.5
+});
+
+
+// 4. Insert Multiple Student Documents
+db.Students.insertMany([
+    { RollNo: 102, Name: "Priya", Department: "BCA", Semester: 5, CGPA: 8.7 },
+    { RollNo: 103, Name: "Aman", Department: "MCA", Semester: 4, CGPA: 8.2 },
+    { RollNo: 104, Name: "Neha", Department: "BCA", Semester: 6, CGPA: 9.1 },
+    { RollNo: 105, Name: "Rohit", Department: "BBA", Semester: 3, CGPA: 7.8 }
+]);
+
+
+// 5. Retrieve All Student Documents
+db.Students.find();
+
+
+// 6. Find Student by Roll Number
+db.Students.findOne({ RollNo: 103 });
+
+
+// 7. Retrieve Students by Department
+db.Students.find({ Department: "BCA" });
+
+
+// 8. Display Only Name and Department
+db.Students.find(
+    {},
+    { _id: 0, Name: 1, Department: 1 }
+);
+
+
+// 9. Update Department of a Specific Student
+db.Students.updateOne(
+    { RollNo: 101 },
+    { $set: { Department: "MCA" } }
+);
+
+
+// 10. Update Semester of All BCA Students
+db.Students.updateMany(
+    { Department: "BCA" },
+    { $set: { Semester: 6 } }
+);
+
+
+// 11. Replace an Existing Student Document
+db.Students.replaceOne(
+    { RollNo: 105 },
+    {
+        RollNo: 105,
+        Name: "Rohit Kumar",
+        Department: "BBA",
+        Semester: 4,
+        CGPA: 8.0
+    }
+);
+
+
+// 12. Add Email Field to All Students
+db.Students.updateMany(
+    {},
+    { $set: { Email: "student@example.com" } }
+);
+
+
+// 13. Remove CGPA Field from All Students
+db.Students.updateMany(
+    {},
+    { $unset: { CGPA: "" } }
+);
+
+
+// 14. Delete a Specific Student by Roll Number
+db.Students.deleteOne({ RollNo: 104 });
+
+
+// 15. Delete Multiple Students by Condition
+db.Students.deleteMany({ Department: "BBA" });
+
+
+// 16. Count Total Student Documents
+db.Students.countDocuments();
+
+
+// 17. Rename Students Collection to StudentDetails
+db.Students.renameCollection("StudentDetails");
+
+
+// 18. Create Departments Collection and Insert Data
+db.createCollection("Departments");
+
+db.Departments.insertMany([
+    { DepartmentID: 1, DepartmentName: "BCA", HOD: "Mr. Sharma" },
+    { DepartmentID: 2, DepartmentName: "MCA", HOD: "Mrs. Verma" },
+    { DepartmentID: 3, DepartmentName: "BBA", HOD: "Mr. Gupta" }
+]);
+
+
+// 19. Drop Departments Collection
+db.Departments.drop();
+
+
+// 20. Drop StudentDB Database
+db.dropDatabase();
+
+
+// 21. Recreate StudentDB and Insert Sample Data
+use("StudentDB");
+
+db.createCollection("Students");
+
+db.Students.insertMany([
+    { RollNo: 101, Name: "Rahul", Department: "BCA", Semester: 6 },
+    { RollNo: 102, Name: "Priya", Department: "BCA", Semester: 5 },
+    { RollNo: 103, Name: "Aman", Department: "MCA", Semester: 4 }
+]);
+
+db.Students.find();
+
+
+// ==========================================
+// 22. CRUD Operations Using MongoDB Compass
+// ==========================================
+
+// CREATE:
+// Use Insert Document to add a student.
+
+// READ:
+// Open the Students collection and click Find.
+
+// UPDATE:
+// Select a document and use Edit or Update.
+
+// DELETE:
+// Select a document and click Delete.
+
+
+// ==========================================
+// 23. Manage Database Using Shell and Compass
+// ==========================================
+
+// SHELL COMMANDS:
+show dbs;
+use("StudentDB");
+show collections;
+db.Students.find();
+
+// In Compass, perform the same operations
+// using the graphical interface.
+
+
+// ==========================================
+// 24. MongoDB CRUD vs SQL
+// ==========================================
+
+// CREATE:
+// MongoDB: db.Students.insertOne({Name:"Rahul"})
+// SQL:     INSERT INTO Students (Name) VALUES ('Rahul');
+
+// READ:
+// MongoDB: db.Students.find()
+// SQL:     SELECT * FROM Students;
+
+// UPDATE:
+// MongoDB: db.Students.updateOne(
+//              {Name:"Rahul"},
+//              {$set:{Name:"Aman"}}
+//          );
+// SQL:     UPDATE Students SET Name='Aman'
+//          WHERE Name='Rahul';
+
+// DELETE:
+// MongoDB: db.Students.deleteOne({Name:"Aman"})
+// SQL:     DELETE FROM Students WHERE Name='Aman';
+
+// DIFFERENCE:
+// MongoDB stores data in BSON documents.
+// SQL databases generally store data in tables and rows.
+
+
+// ==========================================
+// 25. Laboratory Report
+// ==========================================
+
+// OBJECTIVE:
+// To learn MongoDB database and CRUD operations.
+
+// COMMANDS EXECUTED:
+// Create, Insert, Find, Update, Delete,
+// Count, Rename Collection and Drop Database.
+
+// OBSERVATION:
+// Student records were inserted, retrieved,
+// updated and deleted successfully.
+
+// CONCLUSION:
+// MongoDB Shell and Compass were used to
+// understand database and collection management.

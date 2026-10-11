@@ -1,0 +1,143 @@
+# ==========================================
+# NOSQL LAB SHEET 04 - COMPLETE CODE SCRIPT
+# Copy and paste this directly into your terminal or script runner.
+# ==========================================
+
+import requests
+import json
+
+# --- CONFIGURATION FOR PART A: RIAK KV (REST API) ---
+RIAK_HOST = "http://localhost:8098"
+headers = {"Content-Type": "application/json"}
+
+print("--- STARTING RIAK KV OPERATIONS ---")
+
+# Q1 & Q2. Bucket Creation & User Sessions ('students' & 'user_sessions')
+requests.put(f"{RIAK_HOST}/buckets/students/keys/student1", headers=headers, data=json.dumps({"name": "Alice", "age": 21, "course": "CS"}))
+requests.put(f"{RIAK_HOST}/buckets/user_sessions/keys/sess_1001", headers=headers, data=json.dumps({"user_id": "u123", "login_time": "2026-06-07T10:30:00Z", "status": "active"}))
+
+# Q3. User Profiles and Preferences (PUT & GET Operations)
+requests.put(f"{RIAK_HOST}/buckets/profiles/keys/user_alice", headers=headers, data=json.dumps({
+    "name": "Alice Smith",
+    "email": "alice@example.com",
+    "city": "New York",
+    "language": "English",
+    "theme": "dark",
+    "notifications": {"email": True, "sms": False}
+}))
+
+# Q4 & Q8. Shopping Cart Application & Transactions
+requests.put(f"{RIAK_HOST}/buckets/carts/keys/cart_alice", headers=headers, data=json.dumps({
+    "items": [
+        {"product_id": "P101", "quantity": 2, "price": 49.99},
+        {"product_id": "P102", "quantity": 1, "price": 15.00}
+    ],
+    "total": 114.98
+}))
+
+# Q5. Data Types Demonstration (Strings, JSON, Lists)
+requests.put(f"{RIAK_HOST}/buckets/datatypes_demo/keys/record1", headers=headers, data=json.dumps({
+    "string_val": "Hello Riak",
+    "json_doc": {"nested_key": "nested_value"},
+    "list_val": ["item1", "item2", "item3"]
+}))
+
+# Q6. Configuring Read/Write Quorum
+requests.put(f"{RIAK_HOST}/buckets/students/keys/student1?w=2&dw=1", headers=headers, data=json.dumps({"name": "Alice Updated", "age": 22}))
+
+# Q9. Query-by-Data (Secondary Indexes - 2i)
+# (Ensure your bucket has 'age_int' index configured)
+requests.get(f"{RIAK_HOST}/buckets/students/index/age_int/21")
+
+# Q10. Set Operations (Riak Data Types - Sets)
+requests.post(f"{RIAK_HOST}/types/default/buckets/user_interests/datatypes/alice_interests", headers=headers, data=json.dumps({"adds": ["Sports", "Music", "Tech"]}))
+
+print("--- RIAK KV OPERATIONS COMPLETED ---\n")
+
+
+# ==========================================
+# CYPHER QUERIES FOR PART B: NEO4J
+# Copy and run these queries inside your Neo4j Browser/Workspace.
+# ==========================================
+
+NEO4J_CYPHER_SCRIPT = """
+// ==========================================
+// Q11. Create Student, Course, and Department Nodes
+// ==========================================
+CREATE (d:Department {name: 'Computer Science'})
+CREATE (c1:Course {courseId: 'CS101', title: 'Database Systems'})
+CREATE (c2:Course {courseId: 'CS102', title: 'Data Structures'})
+CREATE (s1:Student {studentId: 'S1', name: 'Bob'})
+CREATE (s2:Student {studentId: 'S2', name: 'Charlie'})
+
+CREATE (s1)-[:ENROLLED_IN]->(c1)
+CREATE (s2)-[:ENROLLED_IN]->(c2)
+CREATE (c1)-[:BELONGS_TO]->(d)
+CREATE (c2)-[:BELONGS_TO]->(d);
+
+
+// ==========================================
+// Q12. Social Network Graph
+// ==========================================
+CREATE (p1:Person {name: 'Alice', age: 25})
+CREATE (p2:Person {name: 'Bob', age: 28})
+CREATE (p3:Person {name: 'Diana', age: 24})
+CREATE (comp:Company {name: 'TechCorp'})
+
+CREATE (p1)-[:FRIENDS_WITH]->(p2)
+CREATE (p3)-[:FOLLOWS]->(p1)
+CREATE (p1)-[:WORKS_AT]->(comp)
+CREATE (p2)-[:WORKS_AT]->(comp);
+
+// Query: Find a person's friends and followers
+MATCH (p:Person {name: 'Alice'})-[r:FRIENDS_WITH | FOLLOWS]-(conn)
+RETURN p, r, conn;
+
+
+// ==========================================
+// Q13. E-Commerce Graph
+// ==========================================
+CREATE (cust:Customer {customerId: 'C99', name: 'John Doe'})
+CREATE (cat:Category {catId: 'CAT1', name: 'Electronics'})
+CREATE (prod:Product {productId: 'P500', name: 'Wireless Mouse', price: 25.00})
+CREATE (ord:Order {orderId: 'ORD1001', date: '2026-06-07'})
+
+CREATE (prod)-[:BELONGS_TO]->(cat)
+CREATE (cust)-[:PLACED]->(ord)
+CREATE (ord)-[:CONTAINS]->(prod);
+
+// Query: Find products purchased by a particular customer
+MATCH (c:Customer {name: 'John Doe'})-[:PLACED]->(:Order)-[:CONTAINS]->(p:Product)
+RETURN c.name AS Customer, p.name AS PurchasedProduct;
+
+
+// ==========================================
+// Q14. Transactions & Consistency
+// ==========================================
+MATCH (p:Person {name: 'Alice'})
+SET p.age = 26
+REMOVE p.temporary_tag;
+
+
+// ==========================================
+// Q15. Complete CRUD Operations in Neo4j
+// ==========================================
+// 1. CREATE
+CREATE (n:Item {itemId: 'I1', title: 'Notebook', price: 3.50});
+
+// 2. READ
+MATCH (n:Item {itemId: 'I1'})
+RETURN n.title, n.price;
+
+// 3. UPDATE
+MATCH (n:Item {itemId: 'I1'})
+SET n.price = 4.00
+RETURN n;
+
+// 4. DELETE
+MATCH (n:Item {itemId: 'I1'})
+DELETE n;
+"""
+
+print("--- NEO4J CYPHER SCRIPTS ---")
+print(NEO4J_CYPHER_SCRIPT)

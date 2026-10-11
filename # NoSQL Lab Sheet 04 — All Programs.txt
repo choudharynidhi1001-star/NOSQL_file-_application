@@ -1,0 +1,470 @@
+# NoSQL Lab Sheet 04 — All Programs
+
+## Program 1: Basic Key-Value Operations
+
+```python
+import requests
+
+url = "http://localhost:8098/types/default/buckets/students/keys/101"
+
+data = {"name": "Rahul", "course": "BCA"}
+
+# Store
+print(requests.put(url, json=data).status_code)
+
+# Retrieve
+print(requests.get(url).json())
+
+# Update
+data["name"] = "Aman"
+requests.put(url, json=data)
+print(requests.get(url).json())
+
+# Delete
+print(requests.delete(url).status_code)
+```
+
+## Program 2: User Session Information
+
+```python
+import requests
+
+url = "http://localhost:8098/types/default/buckets/user_sessions/keys/session1"
+
+session = {
+    "session_id": "session1",
+    "user_id": 101,
+    "login_time": "10:30 AM",
+    "status": "active"
+}
+
+requests.put(url, json=session)
+print(requests.get(url).json())
+```
+
+## Program 3: User Profiles and Preferences
+
+```python
+import requests
+
+url = "http://localhost:8098/types/default/buckets/profiles/keys/user1"
+
+profile = {
+    "name": "Rahul",
+    "email": "rahul@example.com",
+    "city": "Agra",
+    "language": "Hindi",
+    "theme": "Dark",
+    "notifications": True
+}
+
+requests.put(url, json=profile)
+print(requests.get(url).json())
+```
+
+## Program 4: Shopping Cart Application
+
+```python
+import requests
+
+url = "http://localhost:8098/types/default/buckets/carts/keys/user1"
+
+cart = {
+    "products": [
+        {"id": 1, "name": "Laptop", "quantity": 1, "price": 40000}
+    ]
+}
+
+# Add
+requests.put(url, json=cart)
+print("Cart:", requests.get(url).json())
+
+# Update quantity
+cart["products"][0]["quantity"] = 2
+requests.put(url, json=cart)
+print("Updated:", requests.get(url).json())
+
+# Remove
+cart["products"] = []
+requests.put(url, json=cart)
+print("After removal:", requests.get(url).json())
+```
+
+## Program 5: Structure of Data in Key-Value Store
+
+```python
+import requests
+
+base = "http://localhost:8098/types/default/buckets/data/keys/"
+
+values = {
+    "string": "Hello Riak",
+    "json": {"name": "Aman", "age": 20},
+    "list": ["Python", "Java", "Dart"]
+}
+
+for key, value in values.items():
+    requests.put(base + key, json=value)
+
+for key in values:
+    print(key, requests.get(base + key).json())
+
+# Bucket = collection
+# Key = unique identifier
+# Value = stored data
+```
+
+## Program 6: Consistency in Riak KV
+
+```python
+import requests
+
+url = "http://localhost:8098/types/default/buckets/consistency/keys/record1"
+
+data = {"version": 1, "message": "First value"}
+
+requests.put(url, json=data)
+print("Read:", requests.get(url).json())
+
+data = {"version": 2, "message": "Updated value"}
+
+requests.put(url, json=data)
+print("Updated:", requests.get(url).json())
+
+print("Riak supports configurable read/write quorum settings.")
+```
+
+## Program 7: Scaling in Riak KV
+
+```python
+import requests
+
+buckets = ["products1", "products2", "products3"]
+
+for bucket in buckets:
+    for i in range(1, 4):
+        url = (
+            "http://localhost:8098/types/default/"
+            f"buckets/{bucket}/keys/product{i}"
+        )
+
+        data = {
+            "id": i,
+            "name": f"Product {i}",
+            "price": i * 100
+        }
+
+        response = requests.put(url, json=data)
+        print(bucket, i, response.status_code)
+
+print("Data inserted into multiple buckets.")
+```
+
+## Program 8: Multi-Operation Shopping Cart
+
+```python
+import requests
+
+url = "http://localhost:8098/types/default/buckets/carts/keys/cart1"
+
+cart = {"items": [], "total": 0}
+
+cart["items"].append(
+    {"name": "Book", "price": 200, "qty": 2}
+)
+cart["items"].append(
+    {"name": "Pen", "price": 10, "qty": 3}
+)
+
+cart["total"] = sum(
+    item["price"] * item["qty"]
+    for item in cart["items"]
+)
+
+requests.put(url, json=cart)
+print("Cart:", requests.get(url).json())
+
+cart["items"][0]["qty"] = 3
+
+cart["total"] = sum(
+    item["price"] * item["qty"]
+    for item in cart["items"]
+)
+
+requests.put(url, json=cart)
+print("Updated:", requests.get(url).json())
+
+print("Riak KV does not provide general multi-key ACID transactions.")
+```
+
+## Program 9: Query-by-Data Functionality
+
+```python
+import requests
+
+base = "http://localhost:8098/types/default/buckets/users/keys/"
+
+users = [
+    {"id": 1, "name": "Aman", "city": "Agra", "age": 20},
+    {"id": 2, "name": "Riya", "city": "Delhi", "age": 22},
+    {"id": 3, "name": "Ravi", "city": "Agra", "age": 25}
+]
+
+for user in users:
+    requests.put(base + str(user["id"]), json=user)
+
+for user in users:
+    response = requests.get(base + str(user["id"]))
+
+    if response.ok:
+        data = response.json()
+
+        if data["city"] == "Agra":
+            print(data)
+
+print("Query completed.")
+```
+
+## Program 10: Set Operations
+
+```python
+import requests
+
+base = "http://localhost:8098/types/default/buckets/interests/keys/"
+
+set1 = {"Python", "Java", "Dart"}
+set2 = {"Java", "C++", "Python"}
+
+requests.put(base + "user1", json=sorted(set1))
+requests.put(base + "user2", json=sorted(set2))
+
+set1.add("Flutter")
+set1.discard("Dart")
+
+print("Membership:", "Python" in set1)
+print("Union:", set1 | set2)
+print("Intersection:", set1 & set2)
+print("Difference:", set1 - set2)
+print("Updated Set:", set1)
+```
+
+---
+
+# Part B — Neo4j (11–15)
+
+Run these Cypher programs in Neo4j Browser.
+
+## Program 11: University Graph
+
+```cypher
+CREATE (s:Student {
+    student_id: 101,
+    name: "Rahul"
+})
+
+CREATE (c:Course {
+    course_id: 1,
+    name: "BCA"
+})
+
+CREATE (d:Department {
+    department_id: 1,
+    name: "Computer Applications"
+})
+
+CREATE (s)-[:ENROLLED_IN]->(c)
+CREATE (c)-[:OFFERED_BY]->(d);
+
+MATCH (s:Student)-[r]->(n)
+RETURN s, r, n;
+```
+
+## Program 12: Social Network
+
+```cypher
+CREATE (p1:Person {name: "Aman"})
+CREATE (p2:Person {name: "Rahul"})
+CREATE (p3:Person {name: "Riya"})
+CREATE (p4:Person {name: "Priya"})
+
+CREATE (p1)-[:FRIENDS_WITH]->(p2)
+CREATE (p1)-[:FOLLOWS]->(p3)
+CREATE (p1)-[:WORKS_AT]->(p4);
+
+MATCH (p:Person {name: "Aman"})-[r]->(other:Person)
+RETURN p, r, other;
+
+MATCH (:Person {name: "Aman"})-[:FOLLOWS]->(p:Person)
+RETURN p.name;
+```
+
+## Program 13: E-Commerce Graph
+
+```cypher
+CREATE (c:Customer {
+    customer_id: 1,
+    name: "Rahul"
+})
+
+CREATE (p1:Product {
+    product_id: 101,
+    name: "Laptop",
+    price: 40000
+})
+
+CREATE (p2:Product {
+    product_id: 102,
+    name: "Mouse",
+    price: 500
+})
+
+CREATE (cat:Category {name: "Electronics"})
+
+CREATE (c)-[:PURCHASED]->(p1)
+CREATE (c)-[:PURCHASED]->(p2)
+
+CREATE (p1)-[:BELONGS_TO]->(cat)
+CREATE (p2)-[:BELONGS_TO]->(cat);
+
+MATCH (c:Customer {name: "Rahul"})-[:PURCHASED]->(p:Product)
+RETURN p.name, p.price;
+```
+
+## Program 14: Transactions and CRUD Operations
+
+```cypher
+// CREATE
+CREATE (p:Product {
+    product_id: 201,
+    name: "Keyboard",
+    price: 1000
+});
+
+// MATCH
+MATCH (p:Product {product_id: 201})
+RETURN p;
+
+// SET
+MATCH (p:Product {product_id: 201})
+SET p.price = 1200
+RETURN p;
+
+// DELETE
+MATCH (p:Product {product_id: 201})
+DELETE p;
+```
+
+## Program 15: Graph Database Application Using Python
+
+Install the driver:
+
+```bash
+pip install neo4j
+```
+
+Python code:
+
+```python
+from neo4j import GraphDatabase
+
+URI = "bolt://localhost:7687"
+USERNAME = "neo4j"
+PASSWORD = "your_password"
+
+driver = GraphDatabase.driver(
+    URI,
+    auth=(USERNAME, PASSWORD)
+)
+
+
+def create_person(name, city):
+    with driver.session() as session:
+        session.run(
+            "CREATE (p:Person {name: $name, city: $city})",
+            name=name,
+            city=city
+        )
+        print("Person created.")
+
+
+def display_people():
+    with driver.session() as session:
+        result = session.run(
+            "MATCH (p:Person) "
+            "RETURN p.name AS name, p.city AS city"
+        )
+
+        for record in result:
+            print(record["name"], record["city"])
+
+
+def update_person(name, city):
+    with driver.session() as session:
+        session.run(
+            "MATCH (p:Person {name: $name}) "
+            "SET p.city = $city",
+            name=name,
+            city=city
+        )
+        print("Person updated.")
+
+
+def delete_person(name):
+    with driver.session() as session:
+        session.run(
+            "MATCH (p:Person {name: $name}) "
+            "DETACH DELETE p",
+            name=name
+        )
+        print("Person deleted.")
+
+
+try:
+    driver.verify_connectivity()
+
+    create_person("Rahul", "Agra")
+    create_person("Aman", "Delhi")
+
+    print("All People:")
+    display_people()
+
+    update_person("Rahul", "Noida")
+
+    print("After Update:")
+    display_people()
+
+    delete_person("Aman")
+
+    print("After Delete:")
+    display_people()
+
+finally:
+    driver.close()
+```
+
+Change `your_password` to your Neo4j database password before running the program.
+
+## Extra queries for Program 15
+
+```cypher
+// Social network
+MATCH (p:Person)-[:FRIENDS_WITH]-(friend:Person)
+RETURN p.name, friend.name;
+
+// Product recommendation
+MATCH (p:Product)-[:BELONGS_TO]->(c:Category)
+      <-[:BELONGS_TO]-(other:Product)
+WHERE p <> other
+RETURN p.name, other.name;
+
+// Fraud detection pattern
+MATCH (a:Customer)-[:USES_CONTACT]->(contact)
+      <-[:USES_CONTACT]-(b:Customer)
+WHERE a <> b
+RETURN a.name, b.name;
+
+// Knowledge graph
+MATCH (a)-[r]->(b)
+RETURN a, r, b
+LIMIT 20;
+```
